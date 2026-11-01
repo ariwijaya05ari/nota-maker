@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Nota Maker — JanSae Konveksi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<section id="view-login" class="login hidden">
+  <div class="login-card">
+    <div class="brand-mark">JK</div>
+    <h2>Masuk dengan Google</h2>
+    <p class="muted">Hanya akun pemilik usaha yang dapat mengakses aplikasi ini.</p>
+    <div id="gsi-btn" class="gsi-slot"></div>
+    <p id="login-msg" class="form-error"></p>
+  </div>
+</section>
+
+<!-- ===== SHELL (setelah login) ===== -->
+<div id="app-shell" class="shell hidden">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">JK</span>
+      <div><strong>Nota Maker</strong><small>JanSae Konveksi</small></div>
+    </div>
+    <nav class="nav">
+      <a href="#beranda" data-nav="beranda">Beranda</a>
+      <a href="#buat" data-nav="buat">Buat Nota</a>
+      <a href="#daftar" data-nav="daftar">Daftar Nota</a>
+      <a href="#pengaturan" data-nav="pengaturan">Pengaturan</a>
+    </nav>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <h1 id="page-title">Beranda</h1>
+      <button id="btn-logout" class="btn btn-ghost btn-sm" type="button">Keluar</button>
+    </header>
+
+    <!-- BERANDA -->
+    <section id="view-beranda" class="view hidden">
+      <div id="beranda-body"></div>
+    </section>
+
+    <!-- BUAT NOTA -->
+    <section id="view-buat" class="view hidden">
+      <form id="form-nota" class="card form" autocomplete="off">
+        <h3 class="section-title">01 · Data pelanggan</h3>
+        <div class="field">
+          <label for="f-nama">Nama pelanggan <span class="req">*</span></label>
+          <input id="f-nama" list="dl-pelanggan" required placeholder="Ketik atau pilih dari daftar">
+          <datalist id="dl-pelanggan"></datalist>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="f-telepon">Telepon / WhatsApp</label>
+            <input id="f-telepon" inputmode="tel" placeholder="0812…">
+          </div>
+          <div class="field">
+            <label for="f-email">Email</label>
+            <input id="f-email" type="email" placeholder="nama@email.com">
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-alamat">Alamat</label>
+          <textarea id="f-alamat" rows="2" maxlength="240"></textarea>
+        </div>
+
+        <h3 class="section-title">02 · Barang / jasa</h3>
+        <div id="f-items" class="items"></div>
+        <button id="btn-tambah-item" class="btn btn-dashed" type="button">+ Tambah baris</button>
+
+        <h3 class="section-title">03 · Ringkasan</h3>
+        <div class="grid-2">
+          <div class="field">
+            <label for="f-diskon">Diskon (%)</label>
+            <input id="f-diskon" type="number" min="0" max="100" step="0.5" value="0">
+          </div>
+          <div class="field">
+            <label for="f-pajak">Pajak (%)</label>
+            <input id="f-pajak" type="number" min="0" max="100" step="0.5" value="0">
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-status">Status pembayaran</label>
+          <select id="f-status">
+            <option value="LUNAS">Lunas</option>
+            <option value="BELUM LUNAS">Belum lunas</option>
+          </select>
+        </div>
+        <div class="totals">
+          <div><span>Subtotal</span><span id="p-sub">Rp 0</span></div>
+          <div><span>Diskon</span><span id="p-diskon">- Rp 0</span></div>
+          <div><span>Pajak</span><span id="p-pajak">Rp 0</span></div>
+          <div class="grand"><span>Total</span><span id="p-total">Rp 0</span></div>
+          <small class="muted">Perkiraan. Total final dihitung server saat disimpan.</small>
+        </div>
+
+        <h3 class="section-title">04 · Catatan</h3>
+        <div class="field">
+          <textarea id="f-catatan" rows="2" maxlength="500" placeholder="Kosongkan untuk memakai catatan default"></textarea>
+        </div>
+
+        <p id="form-msg" class="form-error"></p>
+        <div class="form-actions">
+          <button id="btn-batal" class="btn btn-secondary" type="button">Batal</button>
+          <button id="btn-simpan" class="btn btn-primary" type="submit">Simpan &amp; Buat PDF</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- DAFTAR NOTA -->
+    <section id="view-daftar" class="view hidden">
+      <div class="card filters">
+        <input id="q" type="search" placeholder="Cari nomor nota atau nama pelanggan">
+        <div class="grid-3">
+          <select id="f-status-nota">
+            <option value="semua">Semua</option>
+            <option value="lunas">Lunas</option>
+            <option value="belum">Belum lunas</option>
+            <option value="gagal">Gagal kirim</option>
+          </select>
+          <input id="f-dari" type="date" aria-label="Dari tanggal">
+          <input id="f-sampai" type="date" aria-label="Sampai tanggal">
+        </div>
+        <button id="btn-cari" class="btn btn-secondary" type="button">Terapkan filter</button>
+      </div>
+      <div id="list-nota" class="list"></div>
+      <div class="list-foot">
+        <small id="list-info" class="muted"></small>
+        <button id="btn-more" class="btn btn-ghost hidden" type="button">Muat lebih banyak</button>
+      </div>
+    </section>
+
+    <!-- DETAIL NOTA -->
+    <section id="view-detail" class="view hidden">
+      <div id="detail-body"></div>
+    </section>
+
+    <!-- PENGATURAN -->
+    <section id="view-pengaturan" class="view hidden">
+      <form id="form-pengaturan" class="card form" autocomplete="off">
+        <h3 class="section-title">Identitas usaha</h3>
+        <div class="field"><label for="s-nama_usaha">Nama usaha <span class="req">*</span></label><input id="s-nama_usaha" required></div>
+        <div class="field"><label for="s-slogan">Slogan / kategori produk</label><input id="s-slogan"></div>
+        <div class="field"><label for="s-alamat">Alamat</label><textarea id="s-alamat" rows="2"></textarea></div>
+        <div class="grid-2">
+          <div class="field"><label for="s-telepon">Telepon / WhatsApp</label><input id="s-telepon" inputmode="tel"></div>
+          <div class="field"><label for="s-email">Email usaha</label><input id="s-email" type="email"></div>
+        </div>
+        <div class="field"><label for="s-instagram">Instagram</label><input id="s-instagram" placeholder="@akun"></div>
+        <div class="field"><label for="s-ttd_nama">Nama penandatangan</label><input id="s-ttd_nama"></div>
+
+        <h3 class="section-title">Logo (untuk PDF nota)</h3>
+        <div class="field">
+          <input id="s-logo" type="file" accept="image/png,image/jpeg">
+          <small class="muted" id="logo-status">PNG atau JPG, maksimal 1 MB.</small>
+        </div>
+        <button id="btn-logo" class="btn btn-secondary" type="button">Unggah logo</button>
+
+        <h3 class="section-title">Penomoran nota</h3>
+        <div class="grid-2">
+          <div class="field"><label for="s-prefiks">Prefiks</label><input id="s-prefiks" maxlength="10"></div>
+          <div class="field"><label for="s-digit">Panjang digit</label><input id="s-digit" type="number" min="3" max="8"></div>
+        </div>
+        <div class="field"><label>Nomor terakhir</label><input id="s-nomor_terakhir" disabled></div>
+
+        <h3 class="section-title">Catatan kaki nota</h3>
+        <div class="field"><textarea id="s-catatan_default" rows="3"></textarea></div>
+
+        <p id="peng-msg" class="form-error"></p>
+        <div class="form-actions">
+          <button id="btn-peng-simpan" class="btn btn-primary" type="submit">Simpan pengaturan</button>
+        </div>
+      </form>
+    </section>
+
+    <footer class="footer muted">Nota Maker v1.0 · JanSae Konveksi</footer>
+  </main>
+
+  <!-- Navigasi bawah (ponsel) -->
+  <nav class="tabbar">
+    <a href="#beranda" data-nav="beranda">Beranda</a>
+    <a href="#buat" data-nav="buat">Buat</a>
+    <a href="#daftar" data-nav="daftar">Daftar</a>
+    <a href="#pengaturan" data-nav="pengaturan">Setelan</a>
+  </nav>
+</div>
+
+<div id="loading" class="loading hidden" aria-live="polite"><div class="spinner"></div></div>
+<div id="toast" class="toast" role="status"></div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
